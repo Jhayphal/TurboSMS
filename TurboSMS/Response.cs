@@ -18,7 +18,7 @@ namespace TurboSMS
 		/// Статус результата обработки запроса, представляет собой сокращённое описание результата.
 		/// </summary>
 		[JsonProperty("response_status", Required = Required.Always)]
-		public string ResponseStatus { get; set; }
+		public ResponseStatus ResponseStatus { get; set; }
 
 		/// <summary>
 		/// Данные ответа, если предусмотрены методом. Может быть null, объектом или массивом объектов.

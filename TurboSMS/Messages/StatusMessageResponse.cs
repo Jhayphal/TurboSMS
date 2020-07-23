@@ -25,7 +25,7 @@ namespace TurboSMS.Messages
 		/// Статус результата обработки запроса, представляет собой сокращённое описание результата.
 		/// </summary>
 		[JsonProperty("response_status")]
-		public string ResponseStatus { get; set; }
+		public ResponseStatus ResponseStatus { get; set; }
 
 		/// <summary>
 		/// Получатели сообщения, указываются в международном формате (380ХХХХХХХХХ). Параметр всегда должен быть передан в виде массива, даже если получатель только один. Допускается не более 5000 получателей в одном запросе.
@@ -61,6 +61,6 @@ namespace TurboSMS.Messages
 		/// Если Viber сообщение невозможно отправить, в этом поле будет содержаться причина. При успешной отправке в значении будет пустая строка.
 		/// </summary>
 		[JsonProperty("rejected_status", NullValueHandling = NullValueHandling.Ignore)]
-		public string RejectedStatus { get; set; }
+		public RejectedStatus? RejectedStatus { get; set; }
 	}
 }

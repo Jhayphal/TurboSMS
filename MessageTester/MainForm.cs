@@ -20,42 +20,63 @@ namespace MessageTester
 
 		private string MessageText => textBoxSms.Text.Trim();
 
-		private List<string> Recipients => textBoxPhones.Text.Split(' ', '\n', '\r').Select(x => x.Trim()).ToList();
+		private List<string> Recipients => Helper.GetFormattedPhoneNumbersList(textBoxPhones.Text);
 
 		private string Token => textBoxToken.Text.Trim();
 
 		private void buttonSendMessage_Click(object sender, EventArgs e)
 		{
-			var message = new TurboSMS.Messages.Message
+			try
 			{
-				Sender = this.Sender,
-				Text = this.MessageText,
-				Recipients = this.Recipients,
-				Sms = new Sms()
-			};
-			
-			MessageEngine engine = new MessageEngine(this.Token);
+				var message = new TurboSMS.Messages.Message
+				{
+					Sender = this.Sender,
+					Text = this.MessageText,
+					Recipients = this.Recipients,
+					Sms = new Sms()
+				};
 
-			var result = engine.SendMessage(message);
+				MessageEngine engine = new MessageEngine(this.Token);
 
-			MessageBox.Show(result?.FirstOrDefault()?.ResponseStatus ?? "Error");
+				var result = engine.SendMessage(message);
+
+				MessageBox.Show(result.FirstOrDefault()?.ResponseStatus ?? "Empty");
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show(exception.Message);
+			}
 		}
 
 		private void buttonBalance_Click(object sender, EventArgs e)
 		{
-			UserEngine engine = new UserEngine(this.Token);
-			var result = engine.ReadBalance();
+			try
+			{
+				UserEngine engine = new UserEngine(this.Token);
+				var result = engine.ReadBalance();
 
-			if (result != null)
-				labelBalance.Text = result.Balance.ToString(CultureInfo.InvariantCulture);
+				if (result != null)
+					labelBalance.Text = result.Balance.ToString(CultureInfo.InvariantCulture);
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show(exception.Message);
+			}
 		}
 
 		private void buttonPing_Click(object sender, EventArgs e)
 		{
-			UserEngine engine = new UserEngine(this.Token);
-			bool result = engine.Ping();
+			try
+			{
+				UserEngine engine = new UserEngine(this.Token);
+				bool result = engine.Ping();
 
-			MessageBox.Show(result.ToString(CultureInfo.InvariantCulture));
+				MessageBox.Show(result ? "Pong" : "Error");
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show(exception.Message);
+			}
 		}
 
 		private void buttonFormatNumber_Click(object sender, EventArgs e)

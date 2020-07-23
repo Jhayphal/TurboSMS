@@ -1,11 +1,15 @@
-﻿namespace TurboSMS.Users
+﻿using System;
+
+using TurboSMS.Properties;
+
+namespace TurboSMS.Users
 {
 	/// <summary>
 	/// Модуль предусматривает работу с аккаунтом пользователя.
 	/// </summary>
-	public class UserEngine : Engine
+	public sealed class UserEngine : Engine
 	{
-		public UserEngine(string token) : base(token, "user") { }
+		public UserEngine(string token) : base(token, Resources.Module_User) { }
 
 		/// <summary>
 		/// Возвращает остаток кредитов на балансе пользователя.
@@ -13,12 +17,14 @@
 		/// <returns>Остаток кредитов.</returns>
 		public BalanceUserResponse ReadBalance()
 		{
-			string result = SendPOSTRequest("balance", null);
+			string result = SendRequest(Resources.UserEngineMethod_Balance, null);
 
 			if (string.IsNullOrWhiteSpace(result))
-				return null;
+				throw new InvalidOperationException(Resources.EmptyServerResponse);
 
 			var obj = Response<BalanceUserResponse>.FromJson(result);
+
+			CheckQueryResult(obj);
 
 			return obj?.ResponseResult;
 		}

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using TurboSMS.Properties;
 
 namespace TurboSMS
 {
@@ -48,7 +49,7 @@ namespace TurboSMS
 		public QueriesProvider(string module)
 		{
 			if (string.IsNullOrWhiteSpace(module))
-				throw new ArgumentException("Не указан модуль.");
+				throw new ArgumentException(Resources.EmptyModuleName);
 
 			Module = module;
 		}
@@ -118,48 +119,20 @@ namespace TurboSMS
 			}
 			catch (WebException e)
 			{
-				switch (e.Status)
+				if (e.Response is HttpWebResponse resp)
 				{
-					case WebExceptionStatus.ProtocolError:
+					using (Stream responseStream = resp.GetResponseStream())
+					{
+						if (responseStream == null)
+							throw;
 
-						if ((e.Response is HttpWebResponse resp))
+						using (StreamReader responseReader = new StreamReader(responseStream))
 						{
-							switch (resp.StatusCode)
-							{
-								case HttpStatusCode.InternalServerError:
-									using (Stream responseStream = resp.GetResponseStream())
-									{
-										if (responseStream == null)
-											throw;
+							string response = responseReader.ReadToEnd();
 
-										using (StreamReader responseReader = new StreamReader(responseStream))
-										{
-											string responseJson = responseReader.ReadToEnd();
-
-											throw new WebException(responseJson);
-										}
-									}
-
-								case HttpStatusCode.BadRequest:
-									using (Stream responseStream = resp.GetResponseStream())
-									{
-										if (responseStream == null)
-											throw;
-
-										using (StreamReader responseReader = new StreamReader(responseStream))
-										{
-											string responseJson = responseReader.ReadToEnd();
-
-											throw new WebException(responseJson);
-										}
-									}
-
-								default:
-									throw new WebException("Неизвестная ошибка.");
-							}
+							throw new WebException(response);
 						}
-
-						break;
+					}
 				}
 
 				throw;
@@ -178,7 +151,7 @@ namespace TurboSMS
 			using (Stream responseStream = response.GetResponseStream())
 			{
 				if (responseStream == null)
-					throw new InvalidOperationException("Нет ответа сервера.");
+					throw new InvalidOperationException(Resources.CantReadServerResponse);
 
 				using (StreamReader streamReader = new StreamReader(responseStream))
 					result = streamReader.ReadToEnd();
@@ -196,10 +169,10 @@ namespace TurboSMS
 		string getMethodUrl(string method, string format = "json")
 		{
 			if (string.IsNullOrEmpty(method))
-				throw new ArgumentException("Не указан метод для выполнения запроса.");
+				throw new ArgumentException(Resources.EmptyModuleName);
 
 			if (string.IsNullOrEmpty(format))
-				throw new ArgumentException("Не указан формат запроса.");
+				throw new ArgumentException(Resources.EmptyQueryFormat);
 
 			return $"{Api}/{Module}/{method}.{format}";
 		}

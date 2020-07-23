@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+
+using TurboSMS.Properties;
 
 namespace TurboSMS.Messages
 {
@@ -7,7 +10,7 @@ namespace TurboSMS.Messages
 	/// </summary>
 	public sealed class MessageEngine : Engine
 	{
-		public MessageEngine(string token) : base(token, "message") { }
+		public MessageEngine(string token) : base(token, Resources.Module_Message) { }
 
 		/// <summary>
 		/// Метод позволяет отправлять SMS и Viber сообщения, а также поддерживает гибридную Viber отправку (если сообщение не было доставлено в Viber, оно автоматически будет отправлено по SMS).
@@ -16,12 +19,14 @@ namespace TurboSMS.Messages
 		/// <returns>Результат операции.</returns>
 		public List<SendMessageResponse> SendMessage(Message message)
 		{
-			string result = SendPOSTRequest("send", message.ToJson());
+			string result = SendRequest(Resources.MessageEngineMethod_Send, message);
 
 			if (string.IsNullOrWhiteSpace(result))
-				return null;
+				throw new InvalidOperationException(Resources.EmptyServerResponse);
 
 			var obj = Response<List<SendMessageResponse>>.FromJson(result);
+
+			CheckQueryResult(obj);
 
 			return obj?.ResponseResult;
 		}
@@ -33,12 +38,14 @@ namespace TurboSMS.Messages
 		/// <returns>Статус доставки.</returns>
 		public List<StatusMessageResponse> ReadStatus(Status status)
 		{
-			string result = SendPOSTRequest("status", status.ToJson());
+			string result = SendRequest(Resources.MessageEngineMethod_Status, status);
 
 			if (string.IsNullOrWhiteSpace(result))
-				return null;
+				throw new InvalidOperationException(Resources.EmptyServerResponse);
 
 			var obj = Response<List<StatusMessageResponse>>.FromJson(result);
+
+			CheckQueryResult(obj);
 
 			return obj?.ResponseResult;
 		}

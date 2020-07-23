@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
+using System.Collections.Generic;
+
+using TurboSMS.Properties;
 
 namespace TurboSMS
 {
@@ -22,12 +24,12 @@ namespace TurboSMS
 		public static string PreparePhoneNumber(string phone)
 		{
 			if (string.IsNullOrWhiteSpace(phone))
-				throw new InvalidOperationException("Указано пустое значение.");
+				throw new InvalidOperationException(Resources.EmptyValue);
 
 			phone = dropNotDecimalDigit(phone);
 
 			if (string.IsNullOrWhiteSpace(phone))
-				throw new InvalidOperationException("Номер не содержит ни одной цифры.");
+				throw new InvalidOperationException(Resources.NumberHasntDigits);
 
 			int length = phone.Length;
 
@@ -65,10 +67,10 @@ namespace TurboSMS
 		public static List<string> GetFormattedPhoneNumbersList(string phones, string separators = "\n", bool throwException = false)
 		{
 			if (separators == null)
-				throw new ArgumentException("Не указан обязательный параметр phones.");
+				throw new ArgumentException(Resources.EmptyParam_Phones);
 
 			if (separators == null)
-				throw new ArgumentException("Не указан обязательный параметр separators.");
+				throw new ArgumentException(Resources.EmptyParam_Separators);
 
 			List<string> result = new List<string>();
 
@@ -81,7 +83,8 @@ namespace TurboSMS
 			{
 				try
 				{
-					result.Add(PreparePhoneNumber(word));
+					if(word.TrimEnd() != string.Empty)
+						result.Add(PreparePhoneNumber(word));
 				}
 				catch
 				{
